@@ -19,9 +19,6 @@ from models.logreg import LogReg
 from utils.training_helper import TrainingHelper
 from utils.data_helper import DataHelper
 
-NEPTUNE_LOG = False
-
-
 data_helper = DataHelper()
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -64,30 +61,6 @@ if NEPTUNE_LOG:
     neptune.init(project_qualified_name='uw-niedziol/fashion-mnist')
     neptune.create_experiment(name='Convolutional Network',
                               upload_source_files=['main.py', 'models/*.py'])
-#
-# print("----------RAW----------")
-# model = models['raw']
-# run_hist = training_raw.train_and_evaluate_model(model,
-#                                              nn.CrossEntropyLoss(),
-#                                              optim.Adam(model.parameters()),
-#                                              num_epochs=50)
-# training_raw.save(model, 'raw1')
-#
-# print("----------FLIP----------")
-# model = models['flip']
-# run_hist = training_flip.train_and_evaluate_model(model,
-#                                              nn.CrossEntropyLoss(),
-#                                              optim.Adam(model.parameters()),
-#                                              num_epochs=50)
-# training_flip.save(model, 'flip1')
-#
-# print("----------ROTATE----------")
-# model = models['rotate']
-# run_hist = training_rotate.train_and_evaluate_model(model,
-#                                              nn.CrossEntropyLoss(),
-#                                              optim.Adam(model.parameters()),
-#                                              num_epochs=50)
-# training_rotate.save(model, 'rotate1')
 
 models = {
     'raw': training_rotate.load('raw1'),
@@ -120,8 +93,6 @@ for inputs, labels in data_helper.get_loader_test(test_set):
 
 acc_test = running_corrects_test.float() / len(test_set)
 print(acc_test)
-# neptune.log_metric('acc_test', acc_test)
-
 
 predictions = np.array(predictions)
 
@@ -129,6 +100,3 @@ submission = pd.DataFrame()
 submission['Id'] = np.arange(len(test_set))
 submission['Class'] = predictions
 submission.to_csv('submission4.csv', index=False)
-
-# if not NEPTUNE_LOG:
-#     training.plot_training(run_hist_log_reg)
