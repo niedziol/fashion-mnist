@@ -19,6 +19,8 @@ from models.logreg import LogReg
 from utils.training_helper import TrainingHelper
 from utils.data_helper import DataHelper
 
+NEPTUNE_LOG = False
+
 data_helper = DataHelper()
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
