@@ -49,7 +49,6 @@ training_rotate = TrainingHelper(len(train_set_rotate),
                               device,
                               NEPTUNE_LOG, 'rotation')
 
-
 models = {
     'raw': ConvNet().to(device),
     'flip': ConvNet().to(device),
@@ -59,16 +58,40 @@ models = {
 criterion = nn.CrossEntropyLoss()
 optimizer_raw = optim.Adam(models['raw'].parameters())
 
+print("----------RAW----------")
+model = models['raw']
+run_hist = training_raw.train_and_evaluate_model(model,
+                                             nn.CrossEntropyLoss(),
+                                             optim.Adam(model.parameters()),
+                                             num_epochs=50)
+training_raw.save(model, 'raw1')
+
+print("----------FLIP----------")
+model = models['flip']
+run_hist = training_flip.train_and_evaluate_model(model,
+                                             nn.CrossEntropyLoss(),
+                                             optim.Adam(model.parameters()),
+                                             num_epochs=50)
+training_flip.save(model, 'flip1')
+
+print("----------ROTATE----------")
+model = models['rotate']
+run_hist = training_rotate.train_and_evaluate_model(model,
+                                             nn.CrossEntropyLoss(),
+                                             optim.Adam(model.parameters()),
+                                             num_epochs=50)
+training_rotate.save(model, 'rotate1')
+
 if NEPTUNE_LOG:
     neptune.init(project_qualified_name='uw-niedziol/fashion-mnist')
     neptune.create_experiment(name='Convolutional Network',
                               upload_source_files=['main.py', 'models/*.py'])
 
-models = {
-    'raw': training_rotate.load('raw1'),
-    'flip': training_rotate.load('flip1'),
-    'rotate': training_rotate.load('rotate1')
-}
+# models = {
+#     'raw': training_rotate.load('raw1'),
+#     'flip': training_rotate.load('flip1'),
+#     'rotate': training_rotate.load('rotate1')
+# }
 
 predictions = []
 
